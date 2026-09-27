@@ -5,6 +5,13 @@ import { ProjectSidebar } from '@/features/project/ui/components/project-sidebar
 import { createClient } from '@/shared/api/rustrak';
 import { searchString } from '@/shared/lib/search-params';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/components/shadcn/select';
+import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
@@ -82,31 +89,39 @@ function ProjectLayout() {
           >
             {t('environment')}
           </label>
-          <select
-            id="project-environment"
-            className="rounded-md border bg-background px-2 py-1 text-sm"
+          <Select
             value={environment ?? ''}
-            onChange={(event) => {
+            onValueChange={(value) => {
               const url = new URL(window.location.href);
-              if (event.target.value)
-                url.searchParams.set('environment', event.target.value);
+              if (value) url.searchParams.set('environment', String(value));
               else url.searchParams.set('environment', '');
               url.searchParams.delete('page');
               router.push(`${url.pathname}${url.search}${url.hash}`);
             }}
           >
-            <option value="">{t('allEnvironments')}</option>
-            {Array.from(
-              new Set([
-                ...(environments.success ? environments.data : []),
-                ...(environment ? [environment] : []),
-              ]),
-            ).map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger
+              id="project-environment"
+              size="sm"
+              className="min-w-44 max-w-56"
+            >
+              <SelectValue>
+                {(value) => (value ? String(value) : t('allEnvironments'))}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">{t('allEnvironments')}</SelectItem>
+              {Array.from(
+                new Set([
+                  ...(environments.success ? environments.data : []),
+                  ...(environment ? [environment] : []),
+                ]),
+              ).map((name) => (
+                <SelectItem key={name} value={name}>
+                  {name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         {/* Mobile-only bar — opens the sidebar sheet. On desktop the sidebar
             collapses via its footer button, drag-rail, or Cmd/Ctrl+B.
