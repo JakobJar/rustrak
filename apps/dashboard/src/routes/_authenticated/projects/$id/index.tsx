@@ -64,7 +64,7 @@ function ProjectPage() {
   const tile = { projectId, period, environment };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] flex-col overflow-auto">
+    <div className="flex h-full flex-col overflow-auto">
       <div className="w-full shrink-0 border-b px-4 py-4 md:px-8 md:py-6">
         <ProjectHeader project={project} />
       </div>

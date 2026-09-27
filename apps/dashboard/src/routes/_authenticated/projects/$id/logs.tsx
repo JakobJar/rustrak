@@ -91,7 +91,7 @@ function LogsPage() {
   const logs = logsResult.data;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)]">
+    <div className="flex flex-col h-full">
       <div className="shrink-0 w-full px-4 md:px-8 py-4 md:py-6 border-b">
         <h1 className="text-lg font-semibold">{t('logs.title')}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">

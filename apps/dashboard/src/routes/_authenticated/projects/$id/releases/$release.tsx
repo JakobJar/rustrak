@@ -140,7 +140,7 @@ function ReleaseDetailPage() {
     : rows;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] overflow-auto">
+    <div className="flex flex-col h-full overflow-auto">
       <div className="shrink-0 w-full px-4 md:px-8 py-4 md:py-6 border-b">
         <h1 className="text-lg font-semibold font-mono">{releaseVersion}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">

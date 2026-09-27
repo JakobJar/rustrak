@@ -209,7 +209,7 @@ function EventView({
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] bg-background">
+    <div className="flex flex-col h-full bg-background">
       <EventHeader
         issue={issue}
         projectId={projectId}

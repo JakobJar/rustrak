@@ -78,11 +78,11 @@ function ProjectLayout() {
   return (
     <SidebarProvider
       defaultOpen={sidebarWasOpen()}
-      className="min-h-[calc(100svh-4rem)]!"
+      className="h-[calc(100svh-4rem)]! min-h-0!"
     >
       <ProjectSidebar projectId={projectId} projects={projects} />
-      <SidebarInset className="min-w-0 overflow-hidden">
-        <div className="flex items-center gap-2 border-b px-4 py-2 md:px-8">
+      <SidebarInset className="min-h-0 min-w-0 overflow-hidden">
+        <div className="flex shrink-0 items-center gap-2 border-b px-4 py-2 md:px-8">
           <label
             htmlFor="project-environment"
             className="text-sm text-muted-foreground"
@@ -133,7 +133,9 @@ function ProjectLayout() {
             {project.success ? project.data.name : ''}
           </span>
         </div>
-        <Outlet />
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );
