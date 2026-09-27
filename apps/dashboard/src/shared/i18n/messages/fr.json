@@ -202,7 +202,7 @@
     "allLevels": "Tous",
     "empty": {
       "title": "Aucun journal ne correspond à ce filtre",
-      "hint": "Essayez un autre niveau ou effacez le filtre."
+      "hint": "Essayez un autre niveau ou environnement, ou effacez le filtre."
     }
   },
   "issues": {
@@ -943,8 +943,8 @@
   "releases": {
     "all": "Toutes",
     "empty": {
-      "title": "Aucune version dans cette fenêtre",
-      "hint": "Essayez une période plus longue ou effacez le filtre."
+      "title": "Aucune version ne correspond à ces filtres",
+      "hint": "Essayez une autre période ou un autre environnement, ou effacez le filtre."
     },
     "columns": {
       "release": "Version"
@@ -1373,6 +1373,7 @@
       "subtitle": "Transactions de {project}, regroupées par nom et par opération",
       "loadFailed": "Impossible de charger les transactions",
       "emptyTitle": "Aucune transaction pour le moment",
+      "noEnvironmentData": "Aucune transaction dans l'environnement sélectionné",
       "emptyDescription": "Configurez votre SDK avec <code>tracesSampleRate</code> pour commencer à capturer des données de performance.",
       "backLink": "Performance"
     },

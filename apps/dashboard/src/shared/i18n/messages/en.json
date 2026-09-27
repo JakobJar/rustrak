@@ -202,7 +202,7 @@
     "allLevels": "All",
     "empty": {
       "title": "No logs match this filter",
-      "hint": "Try a different level or clear the filter."
+      "hint": "Try a different level or environment, or clear the filter."
     }
   },
   "issues": {
@@ -943,8 +943,8 @@
   "releases": {
     "all": "All",
     "empty": {
-      "title": "No releases in this window",
-      "hint": "Try a longer period or clear the filter."
+      "title": "No releases match these filters",
+      "hint": "Try a different period or environment, or clear the filter."
     },
     "columns": {
       "release": "Release"
@@ -1373,6 +1373,7 @@
       "subtitle": "Transactions for {project}, grouped by name and operation",
       "loadFailed": "Could not load transactions",
       "emptyTitle": "No transactions yet",
+      "noEnvironmentData": "No transactions in the selected environment",
       "emptyDescription": "Configure your SDK with <code>tracesSampleRate</code> to start capturing performance data.",
       "backLink": "Performance"
     },

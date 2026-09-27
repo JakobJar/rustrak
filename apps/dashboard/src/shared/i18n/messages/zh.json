@@ -202,7 +202,7 @@
     "allLevels": "全部",
     "empty": {
       "title": "没有符合筛选条件的日志",
-      "hint": "尝试其他级别，或清除筛选条件。"
+      "hint": "尝试其他级别或环境，或清除筛选条件。"
     }
   },
   "issues": {
@@ -943,8 +943,8 @@
   "releases": {
     "all": "全部",
     "empty": {
-      "title": "此时间范围内没有发布版本",
-      "hint": "请尝试更长的时间范围或清除筛选条件。"
+      "title": "没有符合筛选条件的发布版本",
+      "hint": "尝试其他时间范围或环境，或清除筛选条件。"
     },
     "columns": {
       "release": "版本"
@@ -1373,6 +1373,7 @@
       "subtitle": "{project} 的事务，按名称和操作分组",
       "loadFailed": "无法加载事务",
       "emptyTitle": "暂无事务",
+      "noEnvironmentData": "所选环境中没有事务",
       "emptyDescription": "在 SDK 中配置 <code>tracesSampleRate</code> 以开始采集性能数据。",
       "backLink": "性能"
     },

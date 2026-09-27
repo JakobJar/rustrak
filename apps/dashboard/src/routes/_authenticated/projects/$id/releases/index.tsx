@@ -100,8 +100,12 @@ export const Route = createFileRoute('/_authenticated/projects/$id/releases/')({
 function ReleasesPage() {
   const t = useTranslations('projectPages');
   const { id } = Route.useParams();
-  const { page, period } = Route.useSearch({
-    select: (search) => ({ page: search.page ?? 1, period: search.period }),
+  const { page, period, environment } = Route.useSearch({
+    select: (search) => ({
+      page: search.page ?? 1,
+      period: search.period,
+      environment: search.environment,
+    }),
   });
   const { project: projectResult, health: healthResult } =
     Route.useLoaderData();
@@ -140,7 +144,7 @@ function ReleasesPage() {
       </div>
 
       <div className="flex-1 overflow-hidden w-full px-4 md:px-8 py-4 md:py-6">
-        {health.total_count === 0 && !period ? (
+        {health.total_count === 0 && !period && !environment ? (
           <div className="flex flex-col items-center justify-center min-h-full text-center">
             <Rocket className="size-12 text-muted-foreground/30 mb-4" />
             <h2 className="text-lg font-semibold mb-1">

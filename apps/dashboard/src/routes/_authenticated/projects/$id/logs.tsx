@@ -60,8 +60,12 @@ export const Route = createFileRoute('/_authenticated/projects/$id/logs')({
 function LogsPage() {
   const t = useTranslations('projectPages');
   const { id } = Route.useParams();
-  const { page, level } = Route.useSearch({
-    select: (search) => ({ page: search.page ?? 1, level: search.level }),
+  const { page, level, environment } = Route.useSearch({
+    select: (search) => ({
+      page: search.page ?? 1,
+      level: search.level,
+      environment: search.environment,
+    }),
   });
   const { project: projectResult, logs: logsResult } = Route.useLoaderData();
   const projectId = Number.parseInt(id, 10);
@@ -100,7 +104,7 @@ function LogsPage() {
       </div>
 
       <div className="flex-1 overflow-hidden w-full px-4 md:px-8 py-4 md:py-6">
-        {logs.total_count === 0 && !level ? (
+        {logs.total_count === 0 && !level && !environment ? (
           <div className="flex flex-col items-center justify-center min-h-full text-center">
             <ScrollText className="size-12 text-muted-foreground/30 mb-4" />
             <h2 className="text-lg font-semibold mb-1">

@@ -59,8 +59,11 @@ export const Route = createFileRoute(
 function PerformancePage() {
   const t = useTranslations('projectPages');
   const { id } = Route.useParams();
-  const currentPage = Route.useSearch({
-    select: (search) => search.page ?? 1,
+  const { currentPage, environment } = Route.useSearch({
+    select: (search) => ({
+      currentPage: search.page ?? 1,
+      environment: search.environment,
+    }),
   });
   const { project: projectResult, stats: statsResult } = Route.useLoaderData();
   const projectId = Number.parseInt(id, 10);
@@ -99,7 +102,7 @@ function PerformancePage() {
       </div>
 
       <div className="flex-1 overflow-hidden w-full px-4 md:px-8 py-4 md:py-6">
-        {stats.total_count === 0 ? (
+        {stats.total_count === 0 && !environment ? (
           <div className="flex flex-col items-center justify-center min-h-full text-center">
             <Zap className="size-12 text-muted-foreground/30 mb-4" />
             <h2 className="text-lg font-semibold mb-1">
@@ -110,6 +113,13 @@ function PerformancePage() {
                 code: (chunks) => <code>{chunks}</code>,
               })}
             </p>
+          </div>
+        ) : stats.total_count === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-full text-center">
+            <Zap className="size-12 text-muted-foreground/30 mb-4" />
+            <h2 className="text-lg font-semibold mb-1">
+              {t('performance.noEnvironmentData')}
+            </h2>
           </div>
         ) : (
           <TransactionStatsTable

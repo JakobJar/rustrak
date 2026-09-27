@@ -202,7 +202,7 @@
     "allLevels": "Todos",
     "empty": {
       "title": "Ningún registro coincide con este filtro",
-      "hint": "Prueba con otro nivel o borra el filtro."
+      "hint": "Prueba con otro nivel o entorno, o borra el filtro."
     }
   },
   "issues": {
@@ -943,8 +943,8 @@
   "releases": {
     "all": "Todas",
     "empty": {
-      "title": "No hay versiones en esta ventana",
-      "hint": "Prueba con un período más largo o borra el filtro."
+      "title": "Ninguna versión coincide con estos filtros",
+      "hint": "Prueba con otro período o entorno, o borra el filtro."
     },
     "columns": {
       "release": "Versión"
@@ -1373,6 +1373,7 @@
       "subtitle": "Transacciones de {project}, agrupadas por nombre y operación",
       "loadFailed": "No se pudieron cargar las transacciones",
       "emptyTitle": "Aún no hay transacciones",
+      "noEnvironmentData": "No hay transacciones en el entorno seleccionado",
       "emptyDescription": "Configura tu SDK con <code>tracesSampleRate</code> para empezar a capturar datos de rendimiento.",
       "backLink": "Rendimiento"
     },

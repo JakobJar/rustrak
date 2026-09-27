@@ -202,7 +202,7 @@
     "allLevels": "Toate",
     "empty": {
       "title": "Niciun jurnal nu corespunde acestui filtru",
-      "hint": "Încearcă un alt nivel sau șterge filtrul."
+      "hint": "Încearcă un alt nivel sau mediu, ori șterge filtrul."
     }
   },
   "issues": {
@@ -943,8 +943,8 @@
   "releases": {
     "all": "Toate",
     "empty": {
-      "title": "Nicio lansare în această fereastră",
-      "hint": "Încearcă o perioadă mai lungă sau șterge filtrul."
+      "title": "Nicio lansare nu corespunde acestor filtre",
+      "hint": "Încearcă o altă perioadă sau un alt mediu, ori șterge filtrul."
     },
     "columns": {
       "release": "Lansare"
@@ -1373,6 +1373,7 @@
       "subtitle": "Tranzacțiile pentru {project}, grupate după nume și operațiune",
       "loadFailed": "Tranzacțiile nu au putut fi încărcate",
       "emptyTitle": "Încă nu există tranzacții",
+      "noEnvironmentData": "Nu există tranzacții în mediul selectat",
       "emptyDescription": "Configurează SDK-ul cu <code>tracesSampleRate</code> pentru a începe capturarea datelor de performanță.",
       "backLink": "Performanță"
     },
