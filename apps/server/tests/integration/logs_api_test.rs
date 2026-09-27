@@ -258,6 +258,68 @@ async fn test_list_logs_filters_environment_and_excludes_missing_values() {
 }
 
 #[actix_web::test]
+async fn test_long_log_environment_survives_ingestion_and_backfill() {
+    let db = TestDb::new().await;
+    let project = ProjectService::create(
+        &db.pool,
+        CreateProject {
+            name: "Long Log Environment".to_string(),
+            slug: None,
+            platform: None,
+        },
+    )
+    .await
+    .unwrap();
+    let environment = "staging-".repeat(10);
+    let body = serde_json::to_vec(&serde_json::json!({
+        "items": [{
+            "timestamp": 1704801600.0,
+            "body": "long environment",
+            "attributes": {"sentry.environment": {"type": "string", "value": environment}}
+        }]
+    }))
+    .unwrap();
+    LogsProcessor
+        .process(
+            bytes::Bytes::from(body),
+            &ProcessorCtx {
+                pool: db.pool.clone(),
+                project_id: project.id,
+                event_id: Uuid::new_v4(),
+                ingested_at: Utc::now(),
+                remote_addr: None,
+            },
+        )
+        .await
+        .unwrap();
+
+    sqlx::query("UPDATE logs SET environment = NULL WHERE project_id = $1")
+        .bind(project.id)
+        .execute(&db.pool)
+        .await
+        .unwrap();
+    #[cfg(feature = "postgres")]
+    sqlx::query("UPDATE logs SET environment = attributes -> 'sentry.environment' ->> 'value' WHERE project_id = $1")
+        .bind(project.id)
+        .execute(&db.pool)
+        .await
+        .unwrap();
+    #[cfg(not(feature = "postgres"))]
+    sqlx::query("UPDATE logs SET environment = json_extract(attributes, '$.\"sentry.environment\".value') WHERE project_id = $1")
+        .bind(project.id)
+        .execute(&db.pool)
+        .await
+        .unwrap();
+
+    let stored: (String,) = sqlx::query_as("SELECT environment FROM logs WHERE project_id = $1")
+        .bind(project.id)
+        .fetch_one(&db.pool)
+        .await
+        .unwrap();
+    assert_eq!(stored.0, environment);
+}
+
+#[actix_web::test]
 async fn test_list_logs_returns_401_without_token() {
     let db = TestDb::new().await;
     let pool = db.pool.clone();

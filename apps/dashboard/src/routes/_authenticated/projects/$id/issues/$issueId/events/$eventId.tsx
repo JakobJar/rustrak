@@ -97,6 +97,7 @@ const LEVEL_TEXT: Record<string, string> = {
 function EventPage() {
   const t = useTranslations('projectPages');
   const { id, issueId } = Route.useParams();
+  const { environment } = Route.useSearch();
   const {
     project: projectResult,
     issue: issueResult,
@@ -148,6 +149,7 @@ function EventPage() {
       aggregates={aggregatesResult.success ? aggregatesResult.data : null}
       stats30d={statsResult.success ? statsResult.data : null}
       activity={activityResult.success ? activityResult.data : []}
+      selectedEnvironment={environment}
     />
   );
 }
@@ -161,6 +163,7 @@ function EventView({
   aggregates,
   stats30d,
   activity,
+  selectedEnvironment,
 }: {
   projectId: number;
   issueId: string;
@@ -170,6 +173,7 @@ function EventView({
   aggregates: IssueAggregates | null;
   stats30d: IssueStats | null;
   activity: ActivityEntry[];
+  selectedEnvironment?: string;
 }) {
   const t = useTranslations('projectPages');
   const eventData = event.data as Record<string, unknown>;
@@ -231,6 +235,9 @@ function EventView({
               event={event}
               navigation={navigation}
               jumps={jumps}
+              outsideSelectedEnvironment={Boolean(
+                selectedEnvironment && event.environment !== selectedEnvironment,
+              )}
             />
 
             <EventSections

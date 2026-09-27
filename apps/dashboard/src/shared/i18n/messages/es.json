@@ -1475,6 +1475,7 @@
       },
       "loadFailed": "No se pudo cargar el evento",
       "loadNavigationFailed": "No se pudieron cargar los eventos de este problema",
+      "outsideSelectedEnvironment": "Este evento no pertenece al entorno seleccionado.",
       "lastSeen": "Visto por última vez",
       "firstSeen": "Visto por primera vez",
       "inRelease": "en la versión <rel>{release}</rel>",

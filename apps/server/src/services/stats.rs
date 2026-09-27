@@ -606,13 +606,18 @@ async fn count_new_issues(
     #[cfg(feature = "postgres")]
     let (current, previous): (i64, i64) = sqlx::query_as(
         r#"
+        WITH firsts AS (
+            SELECT CASE WHEN $4 IS NULL THEN i.first_seen ELSE (
+                SELECT MIN(e.timestamp) FROM events e
+                WHERE e.issue_id = i.id AND e.environment = $4
+            ) END AS first_seen
+            FROM issues i
+            WHERE i.project_id = $1 AND ($4 IS NOT NULL OR i.first_seen >= $3)
+        )
         SELECT
             COALESCE(SUM(CASE WHEN first_seen >= $2 THEN 1 ELSE 0 END), 0)::bigint,
             COALESCE(SUM(CASE WHEN first_seen <  $2 THEN 1 ELSE 0 END), 0)::bigint
-        FROM issues
-        WHERE project_id = $1
-          AND first_seen >= $3
-          AND ($4 IS NULL OR EXISTS (SELECT 1 FROM events e WHERE e.issue_id = issues.id AND e.environment = $4))
+        FROM firsts WHERE first_seen >= $3
         "#,
     )
     .bind(project_id)
@@ -625,13 +630,18 @@ async fn count_new_issues(
     #[cfg(not(feature = "postgres"))]
     let (current, previous): (i64, i64) = sqlx::query_as(
         r#"
+        WITH firsts AS (
+            SELECT CASE WHEN ?4 IS NULL THEN i.first_seen ELSE (
+                SELECT MIN(e.timestamp) FROM events e
+                WHERE e.issue_id = i.id AND e.environment = ?4
+            ) END AS first_seen
+            FROM issues i
+            WHERE i.project_id = ?1 AND (?4 IS NOT NULL OR datetime(i.first_seen) >= datetime(?3))
+        )
         SELECT
             COALESCE(SUM(CASE WHEN datetime(first_seen) >= datetime(?2) THEN 1 ELSE 0 END), 0),
             COALESCE(SUM(CASE WHEN datetime(first_seen) <  datetime(?2) THEN 1 ELSE 0 END), 0)
-        FROM issues
-        WHERE project_id = ?1
-          AND datetime(first_seen) >= datetime(?3)
-          AND (?4 IS NULL OR EXISTS (SELECT 1 FROM events e WHERE e.issue_id = issues.id AND e.environment = ?4))
+        FROM firsts WHERE datetime(first_seen) >= datetime(?3)
         "#,
     )
     .bind(project_id)

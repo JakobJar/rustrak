@@ -1475,6 +1475,7 @@
       },
       "loadFailed": "无法加载事件",
       "loadNavigationFailed": "无法加载此问题中的事件",
+      "outsideSelectedEnvironment": "此事件不属于所选环境。",
       "lastSeen": "最后出现",
       "firstSeen": "首次出现",
       "inRelease": "发布于 <rel>{release}</rel>",

@@ -1475,6 +1475,7 @@
       },
       "loadFailed": "Impossible de charger l’événement",
       "loadNavigationFailed": "Impossible de charger les événements de ce problème",
+      "outsideSelectedEnvironment": "Cet événement ne fait pas partie de l'environnement sélectionné.",
       "lastSeen": "Dernière apparition",
       "firstSeen": "Première apparition",
       "inRelease": "dans la version <rel>{release}</rel>",

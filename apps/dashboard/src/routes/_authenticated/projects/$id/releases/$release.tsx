@@ -83,9 +83,22 @@ export const Route = createFileRoute(
     // Distinct from the failure above, which is why the check stays after it —
     // and before the second await, so a wrong address does not wait on a
     // request whose answer it will not use.
-    if (loaded.data[1].length === 0 && !deps.environment) {
-      void newIssuesPromise.catch(() => undefined);
-      throw notFound();
+    if (loaded.data[1].length === 0) {
+      const allRows = deps.environment
+        ? await getAllReleaseHealthRows(projectId, releaseVersion)
+        : null;
+      if (allRows && !allRows.success) {
+        void newIssuesPromise.catch(() => undefined);
+        return {
+          loaded: { success: false as const, error: allRows.error },
+          newIssues: null,
+          releaseVersion,
+        };
+      }
+      if (!allRows || allRows.data.length === 0) {
+        void newIssuesPromise.catch(() => undefined);
+        throw notFound();
+      }
     }
 
     const newIssues = await newIssuesPromise;

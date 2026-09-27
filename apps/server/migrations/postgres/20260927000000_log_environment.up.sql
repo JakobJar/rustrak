@@ -1,4 +1,4 @@
-ALTER TABLE logs ADD COLUMN environment VARCHAR(64);
+ALTER TABLE logs ADD COLUMN environment TEXT;
 UPDATE logs SET environment = attributes -> 'sentry.environment' ->> 'value'
 WHERE attributes -> 'sentry.environment' ->> 'type' = 'string'
   AND jsonb_typeof(attributes -> 'sentry.environment' -> 'value') = 'string'

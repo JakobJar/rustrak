@@ -188,6 +188,36 @@ async fn environment_filters_overview_counts_and_chart() {
 }
 
 #[actix_web::test]
+async fn environment_new_issues_use_first_matching_event_date() {
+    let db = TestDb::new().await;
+    let project_id = create_project(&db.pool, "New issue environments").await;
+    let issue = seed_issue(&db.pool, project_id, 1, 36).await;
+    seed_event(&db.pool, project_id, Some(issue), "error", "error", 36).await;
+    seed_event(&db.pool, project_id, Some(issue), "error", "error", 2).await;
+    sqlx::query(
+        "UPDATE events SET environment = CASE WHEN timestamp < $2 THEN 'production' ELSE 'staging' END WHERE issue_id = $1",
+    )
+    .bind(issue)
+    .bind(chrono::Utc::now() - chrono::Duration::hours(24))
+    .execute(&db.pool)
+    .await
+    .unwrap();
+
+    let staging = StatsService::project_summary(&db.pool, project_id, Some(24), Some("staging"))
+        .await
+        .unwrap();
+    assert_eq!(staging.new_issues.current, 1);
+    assert_eq!(staging.new_issues.previous, Some(0));
+
+    let production =
+        StatsService::project_summary(&db.pool, project_id, Some(24), Some("production"))
+            .await
+            .unwrap();
+    assert_eq!(production.new_issues.current, 0);
+    assert_eq!(production.new_issues.previous, Some(1));
+}
+
+#[actix_web::test]
 async fn timeseries_on_empty_project_is_all_zeros() {
     let db = TestDb::new().await;
     let project_id = create_project(&db.pool, "Stats Empty").await;

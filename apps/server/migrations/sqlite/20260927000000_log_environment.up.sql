@@ -1,4 +1,4 @@
-ALTER TABLE logs ADD COLUMN environment VARCHAR(64);
+ALTER TABLE logs ADD COLUMN environment TEXT;
 UPDATE logs SET environment = json_extract(attributes, '$."sentry.environment".value')
 WHERE json_valid(attributes)
   AND json_extract(attributes, '$."sentry.environment".type') = 'string'

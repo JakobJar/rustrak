@@ -491,9 +491,17 @@ impl IssueService {
         let issues = sqlx::query_as::<_, Issue>(
             r#"
             SELECT * FROM issues
-            WHERE project_id = $1 AND first_release = $2
-              AND ($4 IS NULL OR EXISTS (SELECT 1 FROM events e WHERE e.issue_id = issues.id AND e.environment = $4))
-            ORDER BY first_seen DESC
+            WHERE project_id = $1
+              AND (($4 IS NULL AND first_release = $2)
+                OR ($4 IS NOT NULL AND (
+                  SELECT e.release FROM events e
+                  WHERE e.issue_id = issues.id AND e.environment = $4
+                  ORDER BY e.timestamp ASC, e.id ASC LIMIT 1
+                ) = $2))
+            ORDER BY CASE WHEN $4 IS NULL THEN first_seen ELSE (
+              SELECT MIN(e.timestamp) FROM events e
+              WHERE e.issue_id = issues.id AND e.environment = $4
+            ) END DESC
             LIMIT $3
             "#,
         )

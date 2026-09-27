@@ -582,6 +582,41 @@ async fn test_top_issues_for_release_respects_limit() {
     assert_eq!(issues.len(), 3);
 }
 
+#[actix_web::test]
+async fn test_top_issues_for_release_uses_first_event_in_environment() {
+    let db = TestDb::new().await;
+    let project = create_test_project(&db.pool, "Release Environment Project").await;
+    let issue = create_test_issue(&db.pool, project.id, "TypeError", "Cross-environment").await;
+    set_first_release(&db.pool, issue.id, "1.0.0").await;
+
+    for (release, environment, hours_ago) in [("1.0.0", "production", 2), ("2.0.0", "staging", 1)] {
+        sqlx::query(
+            "INSERT INTO events (event_id, project_id, issue_id, data, timestamp, ingested_at, release, environment) VALUES ($1, $2, $3, $4, $5, $5, $6, $7)",
+        )
+        .bind(uuid::Uuid::new_v4())
+        .bind(project.id)
+        .bind(issue.id)
+        .bind(serde_json::json!({}))
+        .bind(chrono::Utc::now() - chrono::Duration::hours(hours_ago))
+        .bind(release)
+        .bind(environment)
+        .execute(&db.pool)
+        .await
+        .unwrap();
+    }
+
+    let staging_first =
+        IssueService::top_issues_for_release(&db.pool, project.id, "1.0.0", 10, Some("staging"))
+            .await
+            .unwrap();
+    assert!(staging_first.is_empty());
+    let staging_second =
+        IssueService::top_issues_for_release(&db.pool, project.id, "2.0.0", 10, Some("staging"))
+            .await
+            .unwrap();
+    assert_eq!(staging_second[0].id, issue.id);
+}
+
 // =============================================================================
 // Get Issue Tests
 // =============================================================================

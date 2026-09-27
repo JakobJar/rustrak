@@ -1475,6 +1475,7 @@
       },
       "loadFailed": "Evenimentul nu a putut fi încărcat",
       "loadNavigationFailed": "Evenimentele din această problemă nu au putut fi încărcate",
+      "outsideSelectedEnvironment": "Acest eveniment nu aparține mediului selectat.",
       "lastSeen": "Ultima apariție",
       "firstSeen": "Prima apariție",
       "inRelease": "în lansarea <rel>{release}</rel>",

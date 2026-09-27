@@ -1475,6 +1475,7 @@
       },
       "loadFailed": "Could not load event",
       "loadNavigationFailed": "Could not load the events in this issue",
+      "outsideSelectedEnvironment": "This event is outside the selected environment.",
       "lastSeen": "Last seen",
       "firstSeen": "First seen",
       "inRelease": "in release <rel>{release}</rel>",
