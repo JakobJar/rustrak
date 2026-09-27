@@ -236,7 +236,8 @@ function EventView({
               navigation={navigation}
               jumps={jumps}
               outsideSelectedEnvironment={Boolean(
-                selectedEnvironment && event.environment !== selectedEnvironment,
+                selectedEnvironment &&
+                  event.environment !== selectedEnvironment,
               )}
             />
 

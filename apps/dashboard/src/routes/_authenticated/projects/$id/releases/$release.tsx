@@ -90,7 +90,7 @@ export const Route = createFileRoute(
       if (allRows && !allRows.success) {
         void newIssuesPromise.catch(() => undefined);
         return {
-          loaded: { success: false as const, error: allRows.error },
+          loaded: allRows,
           newIssues: null,
           releaseVersion,
         };

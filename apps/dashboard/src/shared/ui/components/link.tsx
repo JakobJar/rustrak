@@ -5,7 +5,10 @@ import { projectHrefWithEnvironment } from '@/shared/lib/project-environment';
 type RouterLinkProps = ComponentProps<typeof RouterLink>;
 
 /** Accept the app's string URLs, then pass each URL part to TanStack Router. */
-export type LinkProps = Omit<RouterLinkProps, 'to' | 'href' | 'search' | 'hash'> & {
+export type LinkProps = Omit<
+  RouterLinkProps,
+  'to' | 'href' | 'search' | 'hash'
+> & {
   href: string;
   /**
    * Whether following this link scrolls back to the top.
