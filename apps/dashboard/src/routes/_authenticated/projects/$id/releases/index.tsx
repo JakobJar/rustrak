@@ -14,9 +14,11 @@ function releasesHref(
   projectId: number,
   page: number,
   period?: string,
+  environment?: string,
 ): string {
   const params = new URLSearchParams({ page: String(page) });
   if (period) params.set('period', period);
+  if (environment) params.set('environment', environment);
   return `/projects/${projectId}/releases?${params.toString()}`;
 }
 
@@ -27,10 +29,12 @@ export const Route = createFileRoute('/_authenticated/projects/$id/releases/')({
     // it cannot parse and answers with all-time data while no filter button
     // reads as selected. Drop it instead, so the URL and the UI always agree.
     period: parseReleasePeriod(searchString(search.period)),
+    environment: searchString(search.environment),
   }),
   loaderDeps: ({ search }) => ({
     page: search.page ?? 1,
     period: search.period,
+    environment: search.environment,
   }),
   loader: async ({ params, deps }) => {
     const projectId = Number.parseInt(params.id, 10);
@@ -44,6 +48,7 @@ export const Route = createFileRoute('/_authenticated/projects/$id/releases/')({
       page: deps.page,
       per_page: 20,
       period: deps.period,
+      environment: deps.environment,
     });
 
     // A page past the end still carries a positive total, which would render a
@@ -54,11 +59,18 @@ export const Route = createFileRoute('/_authenticated/projects/$id/releases/')({
       const { total_pages } = health.data;
       if (total_pages > 0 && deps.page > total_pages) {
         throw redirect({
-          href: releasesHref(projectId, total_pages, deps.period),
+          href: releasesHref(
+            projectId,
+            total_pages,
+            deps.period,
+            deps.environment,
+          ),
         });
       }
       if (total_pages === 0 && deps.page > 1) {
-        throw redirect({ href: releasesHref(projectId, 1, deps.period) });
+        throw redirect({
+          href: releasesHref(projectId, 1, deps.period, deps.environment),
+        });
       }
     }
 

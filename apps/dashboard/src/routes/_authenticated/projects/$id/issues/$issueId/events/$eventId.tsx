@@ -28,6 +28,7 @@ import {
 } from '@/features/issue/api/queries';
 import { getProject } from '@/features/project/api/queries';
 import { translator } from '@/shared/i18n/intl';
+import { searchString } from '@/shared/lib/search-params';
 import { CollapsibleRail } from '@/shared/ui/components/collapsible-rail';
 import { LoadFailure } from '@/shared/ui/components/load-failure';
 import { EventHeader } from './$eventId/-components/event-header';
@@ -40,18 +41,22 @@ import { EventTrends } from './$eventId/-components/event-trends';
 export const Route = createFileRoute(
   '/_authenticated/projects/$id/issues/$issueId/events/$eventId',
 )({
-  loader: async ({ params }) => {
+  validateSearch: (search: Record<string, unknown>) => ({
+    environment: searchString(search.environment),
+  }),
+  loaderDeps: ({ search }) => ({ environment: search.environment }),
+  loader: async ({ params, deps }) => {
     const projectId = Number.parseInt(params.id, 10);
     const { issueId, eventId } = params;
 
     const [project, issue, event, navigation, aggregates, stats, activity] =
       await Promise.all([
         getProject(projectId),
-        getIssue(projectId, issueId),
+        getIssue(projectId, issueId, deps.environment),
         getEventDetail(projectId, issueId, eventId),
-        getEventNavigation(projectId, issueId, eventId),
-        getIssueAggregates(projectId, issueId),
-        getIssueStats(projectId, issueId, '30d'),
+        getEventNavigation(projectId, issueId, eventId, deps.environment),
+        getIssueAggregates(projectId, issueId, deps.environment),
+        getIssueStats(projectId, issueId, '30d', deps.environment),
         getIssueActivity(projectId, issueId),
       ]);
 

@@ -12,8 +12,13 @@ export const Route = createFileRoute('/_authenticated/projects/$id/logs')({
   validateSearch: (search: Record<string, unknown>) => ({
     page: searchPage(search.page),
     level: searchString(search.level),
+    environment: searchString(search.environment),
   }),
-  loaderDeps: ({ search }) => ({ page: search.page ?? 1, level: search.level }),
+  loaderDeps: ({ search }) => ({
+    page: search.page ?? 1,
+    level: search.level,
+    environment: search.environment,
+  }),
   loader: async ({ params, deps }) => {
     const projectId = Number.parseInt(params.id, 10);
     const project = await getProject(projectId);
@@ -26,6 +31,7 @@ export const Route = createFileRoute('/_authenticated/projects/$id/logs')({
       page: deps.page,
       per_page: 50,
       level: deps.level,
+      environment: deps.environment,
     });
 
     return { project, logs };

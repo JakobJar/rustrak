@@ -3,7 +3,6 @@ import { Bot } from 'lucide-react';
 import { useTranslations } from 'use-intl';
 import {
   getAgentDuration,
-  getAgentEnvironments,
   getAgentModelsByCalls,
   getAgentModelsByTokens,
   getAgentModelsTable,
@@ -88,9 +87,6 @@ export const Route = createFileRoute('/_authenticated/projects/$id/agents/')({
       getAgentSummary(projectId, breakdown),
       getAgentModelsTable(projectId, breakdown),
       getAgentToolsTable(projectId, breakdown),
-      // Not filtered by the current environment: the picker has to keep
-      // offering the option you would switch back to.
-      getAgentEnvironments(projectId),
     ]);
 
     return { project, loaded };
@@ -161,7 +157,6 @@ function AgentsPage() {
     summary,
     modelRows,
     toolRows,
-    environments,
   ] = loaded.data;
 
   return (
@@ -175,7 +170,6 @@ function AgentsPage() {
           <AgentDashboardFilters
             projectId={projectId}
             current={{ period, environment }}
-            environments={environments}
           />
         </div>
       </div>

@@ -1076,6 +1076,7 @@
     },
     "filters": {
       "allTime": "全部时间",
+      "environment": "环境",
       "allEnvironments": "全部环境"
     },
     "modelsTable": {
@@ -1497,6 +1498,8 @@
       "formatPlainText": "纯文本",
       "formatJson": "JSON",
       "noEventsYet": "暂无事件",
+      "noEventsInEnvironment": "{environment} 中没有事件",
+      "noEventsInEnvironmentDescription": "选择其他环境或全部环境以查看此问题的其他事件。",
       "noEventsDescription": "此问题已创建，但尚未记录任何事件。一旦您的应用发送事件，它们就会显示在这里。"
     }
   },

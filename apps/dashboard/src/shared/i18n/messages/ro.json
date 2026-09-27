@@ -1076,6 +1076,7 @@
     },
     "filters": {
       "allTime": "Tot intervalul",
+      "environment": "Mediu",
       "allEnvironments": "Toate mediile"
     },
     "modelsTable": {
@@ -1497,6 +1498,8 @@
       "formatPlainText": "Text simplu",
       "formatJson": "JSON",
       "noEventsYet": "Niciun eveniment încă",
+      "noEventsInEnvironment": "Niciun eveniment în {environment}",
+      "noEventsInEnvironmentDescription": "Alege alt mediu sau Toate mediile pentru a vedea celelalte evenimente ale acestei probleme.",
       "noEventsDescription": "Această problemă a fost creată, dar încă nu s-a înregistrat niciun eveniment. Evenimentele vor apărea aici imediat ce aplicația ta le trimite."
     }
   },

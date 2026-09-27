@@ -5,7 +5,7 @@ import { getProject } from '@/features/project/api/queries';
 import { getTransactionStats } from '@/features/transaction/api/queries';
 import { TransactionStatsTable } from '@/features/transaction/ui/components/transaction-stats-table';
 import { translator } from '@/shared/i18n/intl';
-import { searchPage } from '@/shared/lib/search-params';
+import { searchPage, searchString } from '@/shared/lib/search-params';
 import { LoadFailure } from '@/shared/ui/components/load-failure';
 
 export const Route = createFileRoute(
@@ -13,8 +13,12 @@ export const Route = createFileRoute(
 )({
   validateSearch: (search: Record<string, unknown>) => ({
     page: searchPage(search.page),
+    environment: searchString(search.environment),
   }),
-  loaderDeps: ({ search }) => ({ page: search.page ?? 1 }),
+  loaderDeps: ({ search }) => ({
+    page: search.page ?? 1,
+    environment: search.environment,
+  }),
   loader: async ({ params, deps }) => {
     const projectId = Number.parseInt(params.id, 10);
     const project = await getProject(projectId);
@@ -26,6 +30,7 @@ export const Route = createFileRoute(
     const stats = await getTransactionStats(projectId, {
       page: deps.page,
       per_page: 20,
+      environment: deps.environment,
     });
 
     return { project, stats };

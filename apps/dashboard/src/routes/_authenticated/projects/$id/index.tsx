@@ -22,6 +22,7 @@ export const Route = createFileRoute('/_authenticated/projects/$id/')({
     // it cannot parse and answers with all-time data while no filter button
     // reads as selected. Drop it instead, so the URL and the UI always agree.
     period: parseOverviewPeriod(searchString(search.period)),
+    environment: searchString(search.environment),
   }),
   loader: ({ params }) => getProject(Number.parseInt(params.id, 10)),
   head: ({ loaderData }) => {
@@ -49,7 +50,7 @@ export const Route = createFileRoute('/_authenticated/projects/$id/')({
 function ProjectPage() {
   const t = useTranslations('projectPages');
   const { id } = Route.useParams();
-  const { period } = Route.useSearch();
+  const { period, environment } = Route.useSearch();
   const projectResult = Route.useLoaderData();
   const projectId = Number.parseInt(id, 10);
 
@@ -60,7 +61,7 @@ function ProjectPage() {
   }
 
   const project = projectResult.data;
-  const tile = { projectId, period };
+  const tile = { projectId, period, environment };
 
   return (
     <div className="flex h-[calc(100vh-64px)] flex-col overflow-auto">

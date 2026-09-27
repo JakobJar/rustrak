@@ -33,7 +33,8 @@ export const Route = createFileRoute(
   validateSearch: (search: Record<string, unknown>) => ({
     environment: searchString(search.environment),
   }),
-  loader: async ({ params }) => {
+  loaderDeps: ({ search }) => ({ environment: search.environment }),
+  loader: async ({ params, deps }) => {
     const projectId = Number.parseInt(params.id, 10);
     const releaseVersion = decodeRelease(params.release);
 
@@ -57,11 +58,17 @@ export const Route = createFileRoute(
       projectId,
       releaseVersion,
       10,
+      deps.environment,
     );
 
     const loaded = await loadAll([
       getProject(projectId),
-      getAllReleaseHealthRows(projectId, releaseVersion),
+      getAllReleaseHealthRows(
+        projectId,
+        releaseVersion,
+        undefined,
+        deps.environment,
+      ),
     ]);
 
     // Both early exits drain the in-flight request above, so a transport-level
@@ -76,7 +83,7 @@ export const Route = createFileRoute(
     // Distinct from the failure above, which is why the check stays after it —
     // and before the second await, so a wrong address does not wait on a
     // request whose answer it will not use.
-    if (loaded.data[1].length === 0) {
+    if (loaded.data[1].length === 0 && !deps.environment) {
       void newIssuesPromise.catch(() => undefined);
       throw notFound();
     }

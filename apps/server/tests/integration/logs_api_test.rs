@@ -173,6 +173,91 @@ async fn test_list_logs_filters_by_level() {
 }
 
 #[actix_web::test]
+async fn test_list_logs_filters_environment_and_excludes_missing_values() {
+    let db = TestDb::new().await;
+    let pool = db.pool.clone();
+    let token = create_test_token(&pool).await;
+    let project = ProjectService::create(
+        &pool,
+        CreateProject {
+            name: "Logs Environment Test".to_string(),
+            slug: None,
+            platform: None,
+        },
+    )
+    .await
+    .unwrap();
+    let body = br#"{"items":[
+        {"timestamp":1704801600.0,"body":"prod","attributes":{"sentry.environment":{"type":"string","value":"production"}}},
+        {"timestamp":1704801601.0,"body":"stage","attributes":{"sentry.environment":{"type":"string","value":"staging"}}},
+        {"timestamp":1704801602.0,"body":"missing"}
+    ]}"#;
+    LogsProcessor
+        .process(
+            bytes::Bytes::copy_from_slice(body),
+            &ProcessorCtx {
+                pool: pool.clone(),
+                project_id: project.id,
+                event_id: Uuid::new_v4(),
+                ingested_at: Utc::now(),
+                remote_addr: None,
+            },
+        )
+        .await
+        .unwrap();
+
+    // Model a pre-migration row and verify the backfill expression.
+    sqlx::query("UPDATE logs SET environment = NULL WHERE project_id = $1 AND body = 'prod'")
+        .bind(project.id)
+        .execute(&pool)
+        .await
+        .unwrap();
+    #[cfg(feature = "postgres")]
+    sqlx::query("UPDATE logs SET environment = attributes -> 'sentry.environment' ->> 'value' WHERE project_id = $1 AND attributes -> 'sentry.environment' ->> 'type' = 'string'")
+        .bind(project.id).execute(&pool).await.unwrap();
+    #[cfg(not(feature = "postgres"))]
+    sqlx::query("UPDATE logs SET environment = json_extract(attributes, '$.\"sentry.environment\".value') WHERE project_id = $1 AND json_extract(attributes, '$.\"sentry.environment\".type') = 'string'")
+        .bind(project.id).execute(&pool).await.unwrap();
+
+    let app = test::init_service(
+        App::new()
+            .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(create_test_config()))
+            .configure(routes::logs::configure)
+            .configure(routes::projects::configure),
+    )
+    .await;
+
+    let req = test::TestRequest::get()
+        .uri(&format!("/api/projects/{}/environments", project.id))
+        .insert_header(("Authorization", format!("Bearer {}", token)))
+        .to_request();
+    let resp = test::call_service(&app, req).await;
+    assert_eq!(resp.status(), 200);
+    let environments: Value = test::read_body_json(resp).await;
+    assert_eq!(environments, serde_json::json!(["production", "staging"]));
+    for (query, count, expected) in [
+        ("", 3, "missing"),
+        ("?environment=", 3, "missing"),
+        ("?environment=production", 1, "prod"),
+        ("?environment=staging", 1, "stage"),
+        ("?environment=unknown", 0, ""),
+    ] {
+        let req = test::TestRequest::get()
+            .uri(&format!("/api/projects/{}/logs{}", project.id, query))
+            .insert_header(("Authorization", format!("Bearer {}", token)))
+            .to_request();
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), 200);
+        let body: Value = test::read_body_json(resp).await;
+        assert_eq!(body["total_count"], count, "query {query}");
+        if count > 0 {
+            assert_eq!(body["items"][0]["body"], expected);
+        }
+    }
+}
+
+#[actix_web::test]
 async fn test_list_logs_returns_401_without_token() {
     let db = TestDb::new().await;
     let pool = db.pool.clone();

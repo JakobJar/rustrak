@@ -1076,6 +1076,7 @@
     },
     "filters": {
       "allTime": "All time",
+      "environment": "Environment",
       "allEnvironments": "All environments"
     },
     "modelsTable": {
@@ -1497,6 +1498,8 @@
       "formatPlainText": "Plain Text",
       "formatJson": "JSON",
       "noEventsYet": "No Events Yet",
+      "noEventsInEnvironment": "No events in {environment}",
+      "noEventsInEnvironmentDescription": "Choose another environment or All environments to see this issue's other events.",
       "noEventsDescription": "This issue has been created but no events have been recorded yet. Events will appear here once your application sends them."
     }
   },

@@ -1076,6 +1076,7 @@
     },
     "filters": {
       "allTime": "Todo el histórico",
+      "environment": "Entorno",
       "allEnvironments": "Todos los entornos"
     },
     "modelsTable": {
@@ -1497,6 +1498,8 @@
       "formatPlainText": "Texto sin formato",
       "formatJson": "JSON",
       "noEventsYet": "Aún no hay eventos",
+      "noEventsInEnvironment": "No hay eventos en {environment}",
+      "noEventsInEnvironmentDescription": "Elige otro entorno o Todos los entornos para ver los demás eventos de este problema.",
       "noEventsDescription": "Este problema se creó pero aún no se ha registrado ningún evento. Los eventos aparecerán aquí en cuanto tu aplicación los envíe."
     }
   },

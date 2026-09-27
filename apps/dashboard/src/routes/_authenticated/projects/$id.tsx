@@ -1,11 +1,15 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { useTranslations } from 'use-intl';
 import { getProject, getProjects } from '@/features/project/api/queries';
 import { ProjectSidebar } from '@/features/project/ui/components/project-sidebar';
+import { createClient } from '@/shared/api/rustrak';
+import { searchString } from '@/shared/lib/search-params';
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from '@/shared/ui/components/shadcn/sidebar';
+import { useRouter } from '@/shared/ui/hooks/use-router';
 
 /**
  * Whether the sidebar was left open.
@@ -23,19 +27,32 @@ function sidebarWasOpen(): boolean {
 }
 
 export const Route = createFileRoute('/_authenticated/projects/$id')({
-  loader: ({ params }) => {
+  validateSearch: (search: Record<string, unknown>) => ({
+    environment: searchString(search.environment),
+  }),
+  loader: async ({ params }) => {
     const projectId = Number.parseInt(params.id, 10);
-    return Promise.all([
+    const client = await createClient();
+    const [project, projects, environments] = await Promise.all([
       getProject(projectId),
       getProjects({ per_page: 100 }),
-    ]).then(([project, projects]) => ({ project, projects }));
+      client.projects.environments(projectId),
+    ]);
+    return { project, projects, environments };
   },
   component: ProjectLayout,
 });
 
 function ProjectLayout() {
   const { id } = Route.useParams();
-  const { project, projects: projectsResponse } = Route.useLoaderData();
+  const {
+    project,
+    projects: projectsResponse,
+    environments,
+  } = Route.useLoaderData();
+  const { environment } = Route.useSearch();
+  const router = useRouter();
+  const t = useTranslations('agents.filters');
   const projectId = Number.parseInt(id, 10);
 
   // The layout renders the chrome around whatever the page does with its own
@@ -58,6 +75,39 @@ function ProjectLayout() {
     >
       <ProjectSidebar projectId={projectId} projects={projects} />
       <SidebarInset className="min-w-0 overflow-hidden">
+        <div className="flex items-center gap-2 border-b px-4 py-2 md:px-8">
+          <label
+            htmlFor="project-environment"
+            className="text-sm text-muted-foreground"
+          >
+            {t('environment')}
+          </label>
+          <select
+            id="project-environment"
+            className="rounded-md border bg-background px-2 py-1 text-sm"
+            value={environment ?? ''}
+            onChange={(event) => {
+              const url = new URL(window.location.href);
+              if (event.target.value)
+                url.searchParams.set('environment', event.target.value);
+              else url.searchParams.set('environment', '');
+              url.searchParams.delete('page');
+              router.push(`${url.pathname}${url.search}${url.hash}`);
+            }}
+          >
+            <option value="">{t('allEnvironments')}</option>
+            {Array.from(
+              new Set([
+                ...(environments.success ? environments.data : []),
+                ...(environment ? [environment] : []),
+              ]),
+            ).map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
         {/* Mobile-only bar — opens the sidebar sheet. On desktop the sidebar
             collapses via its footer button, drag-rail, or Cmd/Ctrl+B.
             top-0: it pins to the top of SidebarInset, which already sits below

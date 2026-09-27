@@ -1,5 +1,6 @@
 import { Link as RouterLink } from '@tanstack/react-router';
 import type { ComponentProps } from 'react';
+import { projectHrefWithEnvironment } from '@/shared/lib/project-environment';
 
 type RouterLinkProps = ComponentProps<typeof RouterLink>;
 
@@ -59,5 +60,15 @@ export function Link({ href, scroll, ...props }: LinkProps) {
     );
   }
 
-  return <RouterLink {...props} href={href} resetScroll={scroll} />;
+  return (
+    <RouterLink
+      {...props}
+      href={
+        typeof window === 'undefined'
+          ? href
+          : projectHrefWithEnvironment(href, window.location.href)
+      }
+      resetScroll={scroll}
+    />
+  );
 }
