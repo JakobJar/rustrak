@@ -589,7 +589,12 @@ async fn test_top_issues_for_release_uses_first_event_in_environment() {
     let issue = create_test_issue(&db.pool, project.id, "TypeError", "Cross-environment").await;
     set_first_release(&db.pool, issue.id, "1.0.0").await;
 
-    for (release, environment, hours_ago) in [("1.0.0", "production", 2), ("2.0.0", "staging", 1)] {
+    for (release, environment, hours_ago) in [
+        ("1.0.0", "production", 4),
+        ("", "staging", 3),
+        ("2.0.0", "staging", 2),
+        ("3.0.0", "staging", 1),
+    ] {
         sqlx::query(
             "INSERT INTO events (event_id, project_id, issue_id, data, timestamp, ingested_at, release, environment) VALUES ($1, $2, $3, $4, $5, $5, $6, $7)",
         )
@@ -615,6 +620,11 @@ async fn test_top_issues_for_release_uses_first_event_in_environment() {
             .await
             .unwrap();
     assert_eq!(staging_second[0].id, issue.id);
+    let staging_third =
+        IssueService::top_issues_for_release(&db.pool, project.id, "3.0.0", 10, Some("staging"))
+            .await
+            .unwrap();
+    assert!(staging_third.is_empty());
 }
 
 // =============================================================================

@@ -496,11 +496,13 @@ impl IssueService {
                 OR ($4 IS NOT NULL AND (
                   SELECT e.release FROM events e
                   WHERE e.issue_id = issues.id AND e.environment = $4
+                    AND e.release <> ''
                   ORDER BY e.timestamp ASC, e.id ASC LIMIT 1
                 ) = $2))
             ORDER BY CASE WHEN $4 IS NULL THEN first_seen ELSE (
               SELECT MIN(e.timestamp) FROM events e
               WHERE e.issue_id = issues.id AND e.environment = $4
+                AND e.release <> ''
             ) END DESC
             LIMIT $3
             "#,
